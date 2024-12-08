@@ -66,8 +66,8 @@ export const getBaseFolderFiles = async (): Promise<File[]> => {
   try {
     const drive = await getDriveService();
     const files: File[] = (await drive.files.list({
-      q: `'${folderId}' in parents and mimeType = 'application/vnd.google-apps.document'`,
-      fields: 'files(id, name, mimeType)'
+      q: `"${folderId}" in parents and mimeType = "application/vnd.google-apps.document"`,
+      fields: "files(id, name, mimeType)"
     })).data?.files;
     return files;
   } catch (error) {
@@ -126,7 +126,7 @@ export const getFilesInYear = async (year: string, mimeType: string = "applicati
       const allFiles: File[] = (await Promise.all(
         monthFolders.map(async (month) => {
           const files: File[] = (await drive.files.list({
-            q: `'${month.id}' in parents and mimeType = '${mimeType}'`,
+            q: `"${month.id}" in parents and mimeType = "${mimeType}"`,
             fields: "files(id, name, mimeType)"
           })).data?.files;
           return files;
@@ -299,14 +299,14 @@ export const createPdfFile = async (pdfFile: PdfFile, folderId: string) => {
  */
 const getOrCreateFolder = async (drive: any, folderName: string, parentFolderId: string): Promise<string> => {
   const response = await drive.files.list({
-    q: `'${parentFolderId}' in parents and name='${folderName}' and mimeType='application/vnd.google-apps.folder'`,
-    fields: 'files(id, name)',
+    q: `"${parentFolderId}" in parents and name="${folderName}" and mimeType="application/vnd.google-apps.folder"`,
+    fields: "files(id, name)",
   });
   if (response.data.files && response.data.files.length > 0) {
     return response.data.files[0].id;
   } else {
     const folder = await drive.files.create({
-      requestBody: { name: folderName, mimeType: 'application/vnd.google-apps.folder', parents: [parentFolderId] }
+      requestBody: { name: folderName, mimeType: "application/vnd.google-apps.folder", parents: [parentFolderId] }
     });
     return folder.data.id;
   }
@@ -322,8 +322,8 @@ const getOrCreateFolder = async (drive: any, folderName: string, parentFolderId:
  */
 const checkExistingFile = async (drive: any, folderId: string, fileName: string): Promise<{ id: string } | null> => {
   const response = await drive.files.list({
-    q: `'${folderId}' in parents and name='${fileName}' and mimeType='application/pdf'`,
-    fields: 'files(id, name)'
+    q: `"${folderId}" in parents and name="${fileName}" and mimeType="application/pdf"`,
+    fields: "files(id, name)"
   });
   const files = response.data.files;
 
@@ -340,7 +340,7 @@ const checkExistingFile = async (drive: any, folderId: string, fileName: string)
  * @param responseType type of response
  * @returns file content
  */
-const fetchFileContent = async (fileId: string, mimeType: string, responseType: 'stream' | 'text' = 'stream'): Promise<any> => {
+const fetchFileContent = async (fileId: string, mimeType: string, responseType: "stream" | "text" = "stream"): Promise<any> => {
   const drive = await getDriveService();
   const response = await drive.files.export({ fileId, mimeType }, { responseType });
   if (!response) throw new Error(`Failed to fetch file content: ${response.status} - ${response.statusText}`);
@@ -357,8 +357,8 @@ const  getYearAndMonth = (fileName: string): [string, string] => {
   const dateTemplate = /\b(\d{2})\.(\d{2})\.(\d{4})\b$/;
   const dateMatch = dateTemplate.exec(fileName);
   const year = dateMatch ? dateMatch[3] : new Date().getFullYear().toString();
-  const month = dateMatch ? dateMatch[2] : new Date().getMonth().toString().padStart(2, '0');
-  const monthName = DateTime.fromFormat(`${year}-${month}`, 'yyyy-MM').toFormat('MMMM');
+  const month = dateMatch ? dateMatch[2] : new Date().getMonth().toString().padStart(2, "0");
+  const monthName = DateTime.fromFormat(`${year}-${month}`, "yyyy-MM").toFormat("MMMM");
   return [year, monthName];
 }
 
@@ -376,17 +376,29 @@ export const uploadDocsContentAsPdf = async (file: File): Promise<any> => {
     const monthFolderId = await getOrCreateFolder(drive, monthName, yearFolderId);;
     const existingFile = await checkExistingFile(drive, monthFolderId, `${file.name}.pdf`);
 
-    const fileContent = await fetchFileContent(file.id, 'application/pdf', 'stream');
+    const fileContent = await fetchFileContent(file.id, "application/pdf", "stream");
     if (existingFile) {
       await drive.files.update({
         fileId: existingFile.id,
-        requestBody: { name: `${file.name}.pdf`, mimeType: 'application/pdf' },
-        media: { mimeType: 'application/pdf', body: fileContent },
+        requestBody: { 
+          name: `${file.name}.pdf`, 
+          mimeType: "application/pdf" 
+        },
+        media: { 
+          mimeType: "application/pdf", 
+          body: fileContent 
+        },
         });
     } else {
       await drive.files.create({
-        requestBody: { name: `${file.name}.pdf`, mimeType: 'application/pdf', parents: [monthFolderId] },
-        media: { mimeType: 'application/pdf', body: fileContent }
+        requestBody: { 
+          name: `${file.name}.pdf`, 
+          mimeType: "application/pdf", 
+          parents: [monthFolderId] 
+        },
+        media: { 
+          mimeType: "application/pdf",
+          body: fileContent }
       });
     }
   } catch (error) {

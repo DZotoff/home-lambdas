@@ -5,8 +5,8 @@ export default {
   events: [
     {
       httpApi: {
-        method: 'get',
-        path: '/memo-create-pdf',
+        method: "get",
+        path: "/memo-create-pdf",
         // authorizer: {
         //   name: "timebankKeycloakAuthorizer"
         // }
