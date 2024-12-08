@@ -37,6 +37,7 @@ import listMemoPdfHandler from "@/functions/memo-management/drive-memos/get-memo
 import getTranslatedMemoPdfHandler from "@/functions/memo-management/drive-memos/get-translated-memo-pdf";
 import getSummaryMemoPdfHandler from "@/functions/memo-management/drive-memos/get-summary-memo-pdf";
 import getContentPdfHandler from "@/functions/memo-management/drive-memos/get-content-pdf";
+import uploadGoogleFileHandler  from "@/functions/memo-management/drive-memos/create-memo-pdf";
 import getTrelloCardsOnListHandler from "@/functions/memo-management/trello-cards/get-trello-cards";
 import getBoardMembersHandler from "@/functions/memo-management/trello-cards/get-board-members";
 import deleteTrelloCardHandler from "@/functions/memo-management/trello-cards/delete-trello-card";
@@ -74,49 +75,49 @@ const serverlessConfiguration: AWS = {
     httpApi: {
       cors: true,
       authorizers: {
-        "timebankKeycloakAuthorizer": {
-          identitySource: "$request.header.Authorization",
-          issuerUrl: env.AUTH_ISSUER,
-          audience: ["account"]
-        }
+        // "timebankKeycloakAuthorizer": {
+        //   identitySource: "$request.header.Authorization",
+        //   issuerUrl: env.AUTH_ISSUER,
+        //   audience: ["account"]
+        // }
       },
     },
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1",
       NODE_OPTIONS: "--enable-source-maps --stack-trace-limit=1000",
-      FORECAST_API_KEY: env.FORECAST_API_KEY,
-      AUTH_ISSUER: env.AUTH_ISSUER,
-      PIPEDRIVE_API_KEY: env.PIPEDRIVE_API_KEY,
-      PIPEDRIVE_API_URL: env.PIPEDRIVE_API_URL,
+      // FORECAST_API_KEY: env.FORECAST_API_KEY,
+      // AUTH_ISSUER: env.AUTH_ISSUER,
+      // PIPEDRIVE_API_KEY: env.PIPEDRIVE_API_KEY,
+      // PIPEDRIVE_API_URL: env.PIPEDRIVE_API_URL,
       METATAVU_BOT_TOKEN: env.METATAVU_BOT_TOKEN,
-      TIMEBANK_BASE_URL: env.TIMEBANK_BASE_URL,
-      FORECAST_BASE_URL: env.FORECAST_BASE_URL,
-      KEYCLOAK_CLIENT_SECRET: env.KEYCLOAK_CLIENT_SECRET,
-      KEYCLOAK_BASE_URL: env.KEYCLOAK_BASE_URL,
-      KEYCLOAK_REALM: env.KEYCLOAK_REALM,
-      KEYCLOAK_USERNAME: env.KEYCLOAK_USERNAME,
-      KEYCLOAK_PASSWORD: env.KEYCLOAK_PASSWORD,
-      KEYCLOAK_ADMIN_SECRET: env.KEYCLOAK_ADMIN_SECRET,
-      KEYCLOAK_CLIENT: env.KEYCLOAK_CLIENT,
-      KEYCLOAK_CLIENT_ID: env.KEYCLOAK_CLIENT_ID,
+      // TIMEBANK_BASE_URL: env.TIMEBANK_BASE_URL,
+      // FORECAST_BASE_URL: env.FORECAST_BASE_URL,
+      // KEYCLOAK_CLIENT_SECRET: env.KEYCLOAK_CLIENT_SECRET,
+      // KEYCLOAK_BASE_URL: env.KEYCLOAK_BASE_URL,
+      // KEYCLOAK_REALM: env.KEYCLOAK_REALM,
+      // KEYCLOAK_USERNAME: env.KEYCLOAK_USERNAME,
+      // KEYCLOAK_PASSWORD: env.KEYCLOAK_PASSWORD,
+      // KEYCLOAK_ADMIN_SECRET: env.KEYCLOAK_ADMIN_SECRET,
+      // KEYCLOAK_CLIENT: env.KEYCLOAK_CLIENT,
+      // KEYCLOAK_CLIENT_ID: env.KEYCLOAK_CLIENT_ID,
       SLACK_USER_OVERRIDE: env.SLACK_USER_OVERRIDE,
-      DAILY_SCHEDULE_TIMER: env.DAILY_SCHEDULE_TIMER,
-      WEEKLY_SCHEDULE_TIMER: env.WEEKLY_SCHEDULE_TIMER,
-      ON_CALL_BUCKET_NAME: env.ON_CALL_BUCKET_NAME,
-      SPLUNK_API_ID: env.SPLUNK_API_ID,
-      SPLUNK_API_KEY: env.SPLUNK_API_KEY,
-      SPLUNK_SCHEDULE_POLICY_NAME: env.SPLUNK_SCHEDULE_POLICY_NAME,
-      SPLUNK_TEAM_ONCALL_URL: env.SPLUNK_TEAM_ONCALL_URL,
-      ONCALL_WEEKLY_SCHEDULE_TIMER: env.ONCALL_WEEKLY_SCHEDULE_TIMER,
+      // DAILY_SCHEDULE_TIMER: env.DAILY_SCHEDULE_TIMER,
+      // WEEKLY_SCHEDULE_TIMER: env.WEEKLY_SCHEDULE_TIMER,
+      // ON_CALL_BUCKET_NAME: env.ON_CALL_BUCKET_NAME,
+      // SPLUNK_API_ID: env.SPLUNK_API_ID,
+      // SPLUNK_API_KEY: env.SPLUNK_API_KEY,
+      // SPLUNK_SCHEDULE_POLICY_NAME: env.SPLUNK_SCHEDULE_POLICY_NAME,
+      // SPLUNK_TEAM_ONCALL_URL: env.SPLUNK_TEAM_ONCALL_URL,
+      // ONCALL_WEEKLY_SCHEDULE_TIMER: env.ONCALL_WEEKLY_SCHEDULE_TIMER,
       GOOGLE_MANAGEMENT_MINUTES_FOLDER_ID: env.GOOGLE_MANAGEMENT_MINUTES_FOLDER_ID,
       GOOGLE_SERVICE_ACCOUNT_CLIENT_EMAIL: env.GOOGLE_SERVICE_ACCOUNT_CLIENT_EMAIL,
       GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY_ID: env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY_ID,
       GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY: env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY,
       GOOGLE_CLOUD_PROJECT_ID: env.GOOGLE_CLOUD_PROJECT_ID,
-      SEVERA_DEMO_BASE_URL: env.SEVERA_DEMO_BASE_URL,
-      SEVERA_DEMO_CLIENT_ID: env.SEVERA_DEMO_CLIENT_ID,
-      SEVERA_DEMO_CLIENT_SECRET: env.SEVERA_DEMO_CLIENT_SECRET,
-      DYNAMODB_ENDPOINT: isLocal ? "http://localhost:8000" : undefined,
+      // SEVERA_DEMO_BASE_URL: env.SEVERA_DEMO_BASE_URL,
+      // SEVERA_DEMO_CLIENT_ID: env.SEVERA_DEMO_CLIENT_ID,
+      // SEVERA_DEMO_CLIENT_SECRET: env.SEVERA_DEMO_CLIENT_SECRET,
+      // DYNAMODB_ENDPOINT: isLocal ? "http://localhost:8000" : undefined,
       TRELLO_API_KEY: env.TRELLO_API_KEY,
       TRELLO_TOKEN: env.TRELLO_TOKEN,
       TRELLO_MANAGEMENT_BOARD_ID: env.TRELLO_MANAGEMENT_BOARD_ID,
@@ -124,76 +125,76 @@ const serverlessConfiguration: AWS = {
       OPENAI_API_KEY: env.OPENAI_API_KEY,
     },
     s3: {
-      "on-call": {
-        bucketName: isLocal ? "local-on-call-data" : "${opt:stage}-on-call-data"
+      "management": {
+        bucketName: isLocal ? "local-management-data" : "${opt:stage}-management-data"
       }
     },
     iam: {
       role: {
-        statements: [
-          {
-            Effect: "Allow",
-            Action: ["s3:GetObject"],
-            Resource: isLocal ? "*" : "arn:aws:s3:::${opt:stage}-on-call-data/*"
-          },
-          {
-            Effect: "Allow",
-            Action: ["s3:PutObject"],
-            Resource: isLocal ? "*" : "arn:aws:s3:::${opt:stage}-on-call-data/*"
-          },
-          {
-            Effect: "Allow",
-            Action: [
-              "dynamodb:DescribeTable",
-              "dynamodb:Query",
-              "dynamodb:Scan",
-              "dynamodb:GetItem",
-              "dynamodb:PutItem",
-              "dynamodb:UpdateItem",
-              "dynamodb:DeleteItem",
-            ],
-            Resource: isLocal ? "*" : [
-              "arn:aws:dynamodb:${self:provider.region}:*:table/SoftwareRegistry",
-              "arn:aws:dynamodb:${self:provider.region}:*:table/Questionnaires",
-              "arn:aws:dynamodb:${self:provider.region}:*:table/VacationRequests"
-            ]
-          }
-        ]
+        // statements: [
+        //   {
+        //     Effect: "Allow",
+        //     Action: ["s3:GetObject"],
+        //     Resource: isLocal ? "*" : "arn:aws:s3:::${opt:stage}-on-call-data/*"
+        //   },
+        //   {
+        //     Effect: "Allow",
+        //     Action: ["s3:PutObject"],
+        //     Resource: isLocal ? "*" : "arn:aws:s3:::${opt:stage}-on-call-data/*"
+        //   },
+        //   {
+        //     Effect: "Allow",
+        //     Action: [
+        //       "dynamodb:DescribeTable",
+        //       "dynamodb:Query",
+        //       "dynamodb:Scan",
+        //       "dynamodb:GetItem",
+        //       "dynamodb:PutItem",
+        //       "dynamodb:UpdateItem",
+        //       "dynamodb:DeleteItem",
+        //     ],
+        //     Resource: isLocal ? "*" : [
+        //       "arn:aws:dynamodb:${self:provider.region}:*:table/SoftwareRegistry",
+        //       "arn:aws:dynamodb:${self:provider.region}:*:table/Questionnaires",
+        //       "arn:aws:dynamodb:${self:provider.region}:*:table/VacationRequests"
+        //     ]
+        //   }
+        // ]
       }
     }
   },
   functions: {
-    listDealsHandler,
-    listLeadsHandler,
-    getLeadByIdHandler,
-    getDealByIdHandler,
-    addInterestToDealHandler,
-    addInterestToLeadHandler,
-    removeInterestFromDealHandler,
-    removeInterestFromLeadHandler,
-    listAllocationsHandler,
-    listProjectsHandler,
-    listTasksHandler,
-    listTimeEntriesHandler,
-    listProjectSprintsHandler,
-    listOnCallDataHandler,
-    weeklyCheckHandler,
-    sendDailyMessage,
-    sendWeeklyMessage,
-    updatePaidHandler,
-    getSlackUserAvatar,
-    createSoftwareHandler,
-    findSoftwareHandler,
-    listSoftwareHandler,
-    updateSoftwareHandler,
-    deleteSoftwareHandler,
-    listUsersHandler,
-    findUserHandler,
-    createQuestionnaireHandler,
-    findQuestionnaireHandler,
-    deleteQuestionnaireHandler,
-    listQuestionnaireHandler,
-    updateQuestionnaireHandler,
+    // listDealsHandler,
+    // listLeadsHandler,
+    // getLeadByIdHandler,
+    // getDealByIdHandler,
+    // addInterestToDealHandler,
+    // addInterestToLeadHandler,
+    // removeInterestFromDealHandler,
+    // removeInterestFromLeadHandler,
+    // listAllocationsHandler,
+    // listProjectsHandler,
+    // listTasksHandler,
+    // listTimeEntriesHandler,
+    // listProjectSprintsHandler,
+    // listOnCallDataHandler,
+    // weeklyCheckHandler,
+    // sendDailyMessage,
+    // sendWeeklyMessage,
+    // updatePaidHandler,
+    // getSlackUserAvatar,
+    // createSoftwareHandler,
+    // findSoftwareHandler,
+    // listSoftwareHandler,
+    // updateSoftwareHandler,
+    // deleteSoftwareHandler,
+    // listUsersHandler,
+    // findUserHandler,
+    // createQuestionnaireHandler,
+    // findQuestionnaireHandler,
+    // deleteQuestionnaireHandler,
+    // listQuestionnaireHandler,
+    // updateQuestionnaireHandler,
     listMemoPdfHandler,
     getTranslatedMemoPdfHandler,
     getSummaryMemoPdfHandler,
@@ -203,15 +204,16 @@ const serverlessConfiguration: AWS = {
     createTrelloCardHandler,
     createCommentHandler,
     getContentPdfHandler,
-    getFlextimeHandler,
-    createVacationRequestHandler,
-    deleteVacationRequestHandler,
-    findVacationRequestHandler,
-    listVacationRequestHandler,
-    updateVacationRequestHandler,
-    getResourceAllocationHandler,
-    getPhasesHandler,
-    getWorkHoursHandler,
+    uploadGoogleFileHandler,
+    // getFlextimeHandler,
+    // createVacationRequestHandler,
+    // deleteVacationRequestHandler,
+    // findVacationRequestHandler,
+    // listVacationRequestHandler,
+    // updateVacationRequestHandler,
+    // getResourceAllocationHandler,
+    // getPhasesHandler,
+    // getWorkHoursHandler,
   },
   package: { individually: true },
   custom: {
@@ -228,55 +230,55 @@ const serverlessConfiguration: AWS = {
   },
   resources: {
     Resources: {
-      Questionnaires: {
-        Type: "AWS::DynamoDB::Table",
-        DeletionPolicy: "Delete",
-        Properties: {
-          TableName: "Questionnaires",
-          AttributeDefinitions: [{ AttributeName: "id", AttributeType: "S" }],
-          KeySchema: [{ AttributeName: "id", KeyType: "HASH" }],
-          ProvisionedThroughput: {
-            ReadCapacityUnits: 1,
-            WriteCapacityUnits: 1
-          },
-        }
-      },
-      Software: {
-        Type: "AWS::DynamoDB::Table",
-        DeletionPolicy: "Delete",
-        Properties: {
-          TableName: "SoftwareRegistry",
-          AttributeDefinitions: [
-            {
-              AttributeName: "id",
-              AttributeType: "S",
-            },
-          ],
-          KeySchema: [
-            {
-              AttributeName: "id",
-              KeyType: "HASH",
-            },
-          ],
-          ProvisionedThroughput: {
-            ReadCapacityUnits: 1,
-            WriteCapacityUnits: 1,
-          },
-        },
-      },
-      VacationRequests: {
-        Type: "AWS::DynamoDB::Table",
-        DeletionPolicy: "Delete",
-        Properties: {
-          TableName: "VacationRequests",
-          AttributeDefinitions: [{ AttributeName: "id", AttributeType: "S" }],
-          KeySchema: [{ AttributeName: "id", KeyType: "HASH" }],
-          ProvisionedThroughput: {
-            ReadCapacityUnits: 1,
-            WriteCapacityUnits: 1
-          },
-        }
-      },
+      // Questionnaires: {
+      //   Type: "AWS::DynamoDB::Table",
+      //   DeletionPolicy: "Delete",
+      //   Properties: {
+      //     TableName: "Questionnaires",
+      //     AttributeDefinitions: [{ AttributeName: "id", AttributeType: "S" }],
+      //     KeySchema: [{ AttributeName: "id", KeyType: "HASH" }],
+      //     ProvisionedThroughput: {
+      //       ReadCapacityUnits: 1,
+      //       WriteCapacityUnits: 1
+      //     },
+      //   }
+      // },
+      // Software: {
+      //   Type: "AWS::DynamoDB::Table",
+      //   DeletionPolicy: "Delete",
+      //   Properties: {
+      //     TableName: "SoftwareRegistry",
+      //     AttributeDefinitions: [
+      //       {
+      //         AttributeName: "id",
+      //         AttributeType: "S",
+      //       },
+      //     ],
+      //     KeySchema: [
+      //       {
+      //         AttributeName: "id",
+      //         KeyType: "HASH",
+      //       },
+      //     ],
+      //     ProvisionedThroughput: {
+      //       ReadCapacityUnits: 1,
+      //       WriteCapacityUnits: 1,
+      //     },
+      //   },
+      // },
+      // VacationRequests: {
+      //   Type: "AWS::DynamoDB::Table",
+      //   DeletionPolicy: "Delete",
+      //   Properties: {
+      //     TableName: "VacationRequests",
+      //     AttributeDefinitions: [{ AttributeName: "id", AttributeType: "S" }],
+      //     KeySchema: [{ AttributeName: "id", KeyType: "HASH" }],
+      //     ProvisionedThroughput: {
+      //       ReadCapacityUnits: 1,
+      //       WriteCapacityUnits: 1
+      //     },
+      //   }
+      // },
     },
   },
 };

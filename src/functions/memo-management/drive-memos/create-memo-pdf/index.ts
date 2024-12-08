@@ -7,9 +7,9 @@ export default {
       httpApi: {
         method: 'get',
         path: '/memo-create-pdf',
-        authorizer: {
-          name: "timebankKeycloakAuthorizer"
-        }
+        // authorizer: {
+        //   name: "timebankKeycloakAuthorizer"
+        // }
       }
     }
   ],
