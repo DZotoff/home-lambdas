@@ -180,7 +180,7 @@ Have a great week!
    */
   const constructCardCreatedMessage = async (title: string): Promise<string> => {
     const message = `
-:card_file_box: *Card Created*: \`${title}\`
+:card_file_box: New Memo Suggestion appeared: *${title}*
     `;  
     return message;
   };
