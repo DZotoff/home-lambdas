@@ -2,6 +2,7 @@ import { google } from "googleapis";
 import { File, PdfFile } from "../schema/google";
 import { Readable } from "stream";
 import {streamToBuffer} from "../libs/file-utils";
+import { DateTime } from "luxon";
 
 const folderId = process.env.GOOGLE_MANAGEMENT_MINUTES_FOLDER_ID;
 
@@ -285,5 +286,110 @@ export const createPdfFile = async (pdfFile: PdfFile, folderId: string) => {
     return response.data.id;
   } catch (error) {
     console.error(`Failed to create PDF file: ${pdfFile.name} in folder ID: ${folderId}`, error);
+  }
+}
+
+/**
+ * Checks if a folder (year or month) exists under a specified parent folder, and creates it if necessary
+ * 
+ * @param drive Drive Instance
+ * @param folderName folder name
+ * @param parentFolderId parent folder ID where the folder should be located/created
+ * @returns ID of folders
+ */
+const getOrCreateFolder = async (drive: any, folderName: string, parentFolderId: string): Promise<string> => {
+  const response = await drive.files.list({
+    q: `'${parentFolderId}' in parents and name='${folderName}' and mimeType='application/vnd.google-apps.folder'`,
+    fields: 'files(id, name)',
+  });
+  if (response.data.files && response.data.files.length > 0) {
+    return response.data.files[0].id;
+  } else {
+    const folder = await drive.files.create({
+      requestBody: { name: folderName, mimeType: 'application/vnd.google-apps.folder', parents: [parentFolderId] }
+    });
+    return folder.data.id;
+  }
+}
+
+/**
+ * Checks PDF file existence
+ * 
+ * @param drive Drive Instance
+ * @param folderId folder ID
+ * @param fileName file name
+ * @returns object of file IDs
+ */
+const checkExistingFile = async (drive: any, folderId: string, fileName: string): Promise<{ id: string } | null> => {
+  const response = await drive.files.list({
+    q: `'${folderId}' in parents and name='${fileName}' and mimeType='application/pdf'`,
+    fields: 'files(id, name)'
+  });
+  const files = response.data.files;
+
+  return files && files.length > 0
+    ? { id: files[0].id }
+    : null;
+}
+
+/**
+ * Fetches the content of a specified file
+ * 
+ * @param fileId file ID
+ * @param mimeType type of file
+ * @param responseType type of response
+ * @returns file content
+ */
+const fetchFileContent = async (fileId: string, mimeType: string, responseType: 'stream' | 'text' = 'stream'): Promise<any> => {
+  const drive = await getDriveService();
+  const response = await drive.files.export({ fileId, mimeType }, { responseType });
+  if (!response) throw new Error(`Failed to fetch file content: ${response.status} - ${response.statusText}`);
+  return response.data
+}
+
+/**
+ * Extracts month and year from file name
+ * 
+ * @param fileName file name
+ * @returns parsed date
+ */
+const  getYearAndMonth = (fileName: string): [string, string] => {
+  const dateTemplate = /\b(\d{2})\.(\d{2})\.(\d{4})\b$/;
+  const dateMatch = dateTemplate.exec(fileName);
+  const year = dateMatch ? dateMatch[3] : new Date().getFullYear().toString();
+  const month = dateMatch ? dateMatch[2] : new Date().getMonth().toString().padStart(2, '0');
+  const monthName = DateTime.fromFormat(`${year}-${month}`, 'yyyy-MM').toFormat('MMMM');
+  return [year, monthName];
+}
+
+/**
+ * Uploads content as PDF and organizes files by year and month in folders.
+ * 
+ * @param file File object
+ */
+export const uploadDocsContentAsPdf = async (file: File): Promise<any> => {
+  const drive = await getDriveService();
+  try {
+    const [year, monthName] = getYearAndMonth(file.name);
+
+    const yearFolderId =  await getOrCreateFolder(drive, year, folderId);;
+    const monthFolderId = await getOrCreateFolder(drive, monthName, yearFolderId);;
+    const existingFile = await checkExistingFile(drive, monthFolderId, `${file.name}.pdf`);
+
+    const fileContent = await fetchFileContent(file.id, 'application/pdf', 'stream');
+    if (existingFile) {
+      await drive.files.update({
+        fileId: existingFile.id,
+        requestBody: { name: `${file.name}.pdf`, mimeType: 'application/pdf' },
+        media: { mimeType: 'application/pdf', body: fileContent },
+        });
+    } else {
+      await drive.files.create({
+        requestBody: { name: `${file.name}.pdf`, mimeType: 'application/pdf', parents: [monthFolderId] },
+        media: { mimeType: 'application/pdf', body: fileContent }
+      });
+    }
+  } catch (error) {
+    throw new Error(`Failed to process file ${file.name}`);
   }
 }
