@@ -6,7 +6,7 @@ export default {
     {
       httpApi: {
         method: "get",
-        path: "/google-drive/memo-summary",
+        path: "/memo-create-pdf",
         // authorizer: {
         //   name: "timebankKeycloakAuthorizer"
         // }

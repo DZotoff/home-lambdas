@@ -7,9 +7,9 @@ export default {
       httpApi: {
         method: "delete",
         path: "/trello/card/{id}",
-        authorizer: {
-          name: "timebankKeycloakAuthorizer"
-        }
+        // authorizer: {
+        //   name: "timebankKeycloakAuthorizer"
+        // }
       }
     }
   ],

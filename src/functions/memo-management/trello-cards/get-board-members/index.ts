@@ -7,9 +7,9 @@ export default {
       httpApi: {
         method: "get",
         path: "/trello/board-members",
-        authorizer: {
-          name: "timebankKeycloakAuthorizer"
-        }
+        // authorizer: {
+        //   name: "timebankKeycloakAuthorizer"
+        // }
       }
     }
   ],

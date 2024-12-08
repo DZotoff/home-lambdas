@@ -1,6 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyHandler } from "aws-lambda";
 import { TrelloService } from "src/service/trello-api-service";
 import { middyfy } from "src/libs/lambda";
+import SlackUtilities from "src/meta-assistant/slack/slack-utils";
 
 /**
  * Interface for JSON body trello card data
@@ -29,6 +30,7 @@ const createTrelloCardHandler: APIGatewayProxyHandler = async (event: APIGateway
 
     const trello = new TrelloService();
     const newCard = await trello.createCard(body.title, body.description);
+    await SlackUtilities.postNotificationToChannel(body.title);
 
     return {
       statusCode: 200,

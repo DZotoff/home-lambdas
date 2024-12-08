@@ -173,6 +173,19 @@ Have a great week!
   };
 
   /**
+   * Create notification message about new card
+   * 
+   * @param title Trello card name
+   * @returns message 
+   */
+  const constructCardCreatedMessage = async (title: string): Promise<string> => {
+    const message = `
+:card_file_box: New Memo Suggestion appeared: *${title}*
+    `;  
+    return message;
+  };
+  
+  /**
    * Sends given message to given slack channel
    *
    * @param channelId channel ID
@@ -286,6 +299,22 @@ Have a great week!
     let message;
       message = await constructMemoDocCreatedMessage(summary, name);
   
+    const messageResults: NotificationMessageResult = {
+      message: message,
+      response: await sendMessage(slackChannelId, message)
+    };
+    return messageResults;
+  }
+
+  /**
+   * Post an instant slack message to users
+   *
+   * @param title Trello card name
+   */
+  export const postNotificationToChannel = async (title: string): Promise<NotificationMessageResult> => {
+    let message;
+      message = await constructCardCreatedMessage(title);
+
     const messageResults: NotificationMessageResult = {
       message: message,
       response: await sendMessage(slackChannelId, message)

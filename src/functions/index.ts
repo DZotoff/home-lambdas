@@ -32,6 +32,7 @@ export { default as listMemoPdfHandler } from "./memo-management/drive-memos/get
 export { default as getTranslatedMemoPdfHandler } from "./memo-management/drive-memos/get-translated-memo-pdf";
 export { default as getSummaryMemoPdfHandler } from "./memo-management/drive-memos/get-summary-memo-pdf";
 export { default as getContentPdfHandler } from "./memo-management/drive-memos/get-content-pdf";
+export { default as uploadGoogleFileHandler  } from "./memo-management/drive-memos/create-memo-pdf";
 export { default as getTrelloCardsOnListHandler } from "./memo-management/trello-cards/get-trello-cards";
 export { default as getBoardMembersHandler } from "./memo-management/trello-cards/get-board-members";
 export { default as deleteTrelloCardHandler } from "./memo-management/trello-cards/delete-trello-card";
